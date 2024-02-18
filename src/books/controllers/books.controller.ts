@@ -1,28 +1,40 @@
-import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
 import { IBook } from '../types';
 import { BooksService } from '../services';
+import { AddBookDto } from '../dto';
+import { BookMapper } from '../helpers';
 
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly _booksService: BooksService,
+    private readonly _bookMapper: BookMapper,
+  ) {}
 
   @Get()
-  getAllBooks(): IBook[] {
-    return this.booksService.getAllBooks();
+  public async getAllBooks(): Promise<unknown> {
+    return await this._booksService.getAllBooks();
   }
 
-  @Post()
-  addBook(): IBook {
-    return {} as IBook;
+  @Get(':slug')
+  public async getBook(): Promise<IBook> {
+    return await this._booksService.getBook();
+  }
+
+  @Post('/create')
+  public async addBook(@Body('book') addBookDto: AddBookDto): Promise<unknown> {
+    const addedBook = await this._booksService.addBook(addBookDto);
+
+    return this._bookMapper.mapBook(addedBook as AddBookDto);
   }
 
   @Put()
-  updateBook(): IBook {
-    return {} as IBook;
+  public async updateBook(): Promise<IBook> {
+    return await this._booksService.updateBook();
   }
 
   @Delete()
-  deleteBook(): IBook {
-    return {} as IBook;
+  public async deleteBook(): Promise<IBook> {
+    return await this._booksService.deleteBook();
   }
 }

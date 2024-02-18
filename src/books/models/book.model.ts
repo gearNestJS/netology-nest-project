@@ -1,8 +1,9 @@
 import { IBook } from '../types';
 
-export class Book implements IBook {
+export class BookModel implements IBook {
   constructor(
     public title: string,
     public price: number,
+    public slug: string,
   ) {}
 }

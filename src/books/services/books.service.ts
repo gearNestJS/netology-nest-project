@@ -1,15 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { IBook } from '../types';
-import { Book } from '../models';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-
-const books: IBook[] = [
-  new Book('title 1', 12),
-  new Book('title 2', 13),
-  new Book('title 3', 14),
-  new Book('title 4', 15),
-];
+import { AddBookDto } from '../dto';
+import { Book } from '../schemas';
 
 @Injectable()
 export class BooksService {
@@ -20,10 +14,10 @@ export class BooksService {
 
   /**
    * Get all books
-   * @return IBook[]
+   * @return Promise<unknown>
    */
-  public async getAllBooks(): Promise<IBook[]> {
-    return [...books];
+  public async getAllBooks(): Promise<unknown> {
+    return this.bookModel.find().exec();
   }
 
   /**
@@ -36,10 +30,12 @@ export class BooksService {
 
   /**
    * Add new book
-   * @return IBook
+   * @return Promise<unknown>
    */
-  public async addBook(): Promise<IBook> {
-    return {} as IBook;
+  public async addBook(addBookDto: AddBookDto): Promise<unknown> {
+    const createdBook = new this.bookModel(addBookDto);
+
+    return createdBook.save();
   }
 
   /**
