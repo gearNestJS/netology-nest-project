@@ -1,5 +1,4 @@
 export interface IBook {
-  title: string;
   price: number;
-  slug: string;
+  title?: string;
 }

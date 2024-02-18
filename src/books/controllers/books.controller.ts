@@ -1,40 +1,73 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+
 import { IBook } from '../types';
 import { BooksService } from '../services';
-import { AddBookDto } from '../dto';
-import { BookMapper } from '../helpers';
+import { RequestBookDto, ResponseBookDto, UpdateBookDto } from '../dto';
+import { BooksMapper } from '../helpers';
 
 @Controller('books')
 export class BooksController {
   constructor(
     private readonly _booksService: BooksService,
-    private readonly _bookMapper: BookMapper,
+    private readonly _bookMapper: BooksMapper,
   ) {}
 
   @Get()
-  public async getAllBooks(): Promise<unknown> {
-    return await this._booksService.getAllBooks();
+  public async getAllBooks(): Promise<IBook[]> {
+    const books: ResponseBookDto[] = await this._booksService.getAllBooks();
+
+    return this._bookMapper.mapBooks(books);
   }
 
   @Get(':slug')
-  public async getBook(): Promise<IBook> {
-    return await this._booksService.getBook();
+  @UsePipes(new ValidationPipe())
+  public async getBook(@Param('slug') slug: string): Promise<IBook> {
+    const findBook: ResponseBookDto = await this._booksService.getBook(slug);
+
+    return this._bookMapper.mapBook(findBook);
   }
 
   @Post('/create')
-  public async addBook(@Body('book') addBookDto: AddBookDto): Promise<unknown> {
-    const addedBook = await this._booksService.addBook(addBookDto);
+  @UsePipes(new ValidationPipe())
+  public async addBook(
+    @Body('book') createBookDto: RequestBookDto,
+  ): Promise<IBook> {
+    const addedBook: ResponseBookDto =
+      await this._booksService.addBook(createBookDto);
 
-    return this._bookMapper.mapBook(addedBook as AddBookDto);
+    return this._bookMapper.mapBook(addedBook);
   }
 
-  @Put()
-  public async updateBook(): Promise<IBook> {
-    return await this._booksService.updateBook();
+  @Put(':slug')
+  @UsePipes(new ValidationPipe())
+  public async updateBook(
+    @Param('slug') slug: string,
+    @Body('book') updateBookDto: UpdateBookDto,
+  ): Promise<IBook> {
+    const updatedBook: ResponseBookDto = await this._booksService.updateBook(
+      slug,
+      updateBookDto,
+    );
+
+    return this._bookMapper.mapBook(updatedBook);
   }
 
-  @Delete()
-  public async deleteBook(): Promise<IBook> {
-    return await this._booksService.deleteBook();
+  @Delete(':slug')
+  @UsePipes(new ValidationPipe())
+  public async deleteBook(@Param('slug') slug: string): Promise<IBook> {
+    const deletedBook: ResponseBookDto =
+      await this._booksService.deleteBook(slug);
+
+    return this._bookMapper.mapBook(deletedBook);
   }
 }

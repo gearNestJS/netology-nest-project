@@ -1,7 +1,8 @@
-import { IBook } from '../types';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
-export class AddBookDto implements IBook {
+import { IBook } from '../types';
+
+export class RequestBookDto implements IBook {
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -9,8 +10,4 @@ export class AddBookDto implements IBook {
   @IsInt()
   @IsNotEmpty()
   price: number;
-
-  @IsString()
-  @IsNotEmpty()
-  slug: string;
 }
