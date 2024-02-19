@@ -94,6 +94,7 @@ export class BooksService {
   /**
    * Find boot by unique id
    * @param slug {string}
+   * @return Promise<ResponseBookDto>
    * @private
    */
   private async _findBySlug(slug: string): Promise<ResponseBookDto> {
